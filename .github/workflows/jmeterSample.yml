@@ -23,4 +23,4 @@ jobs:
           sudo apt-get install -y jmeter
       - name: Run JMeter Test
         run: |
-          jmeter -n -t SampleScript.jmx -l results.jtl
+          jmeter -n -t SampleScript.jmx -l results.jtl -Jxstream.whitelist=org.apache.jmeter.save.ScriptWrapper
