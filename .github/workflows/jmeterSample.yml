@@ -1,38 +1,25 @@
-- name: Set up Java 11
-  uses: actions/setup-java@v4
-  with:
-    distribution: temurin
-    java-version: '11'
-- name: Download Apache JMeter 5.5
-  run: >
-    JMETER_VERSION=5.5
-
-    curl -fsSL
-    "https://archive.apache.org/dist/jmeter/binaries/apache-jmeter-${JMETER_VERSION}.tgz"
-    -o jmeter.tgz
-
-    tar -xzf jmeter.tgz
-- name: Run SampleScript.jmx (non-GUI)
-  env:
-    JMETER_HOME: '${{ github.workspace }}/apache-jmeter-5.5'
-  run: >
-    set -e
-
-    # adjust the path to SampleScript.jmx below if it's not in the repo root
-
-    JMETER_TEST="${{ github.workspace }}/SampleScript.jmx"
-
-    if [ ! -f "$JMETER_TEST" ]; then
-      echo "ERROR: $JMETER_TEST not found. Update the -t path in the workflow to point to your .jmx file."
-      exit 2
-    fi
-
-    ./apache-jmeter-5.5/bin/jmeter -n -t "$JMETER_TEST" -l results.jtl -j
-    jmeter.log
-- name: Upload JMeter results
-  uses: actions/upload-artifact@v4
-  with:
-    name: jmeter-results
-    path: |
-      results.jtl
-      jmeter.log
+name: Run JMeter Tests
+'on':
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+jobs:
+  jmeter:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+      - name: Set up JDK
+        uses: actions/setup-java@v2
+        with:
+          java-version: '11'
+      - name: Install JMeter
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y jmeter
+      - name: Run JMeter Test
+        run: |
+          jmeter -n -t SampleScript.jmx -l results.jtl
