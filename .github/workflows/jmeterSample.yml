@@ -1,26 +1,36 @@
 name: Run JMeter Tests
-'on':
+
+on:
   push:
     branches:
       - main
   pull_request:
     branches:
       - main
+
 jobs:
   jmeter:
     runs-on: ubuntu-latest
+
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v2
-      - name: Set up JDK
-        uses: actions/setup-java@v2
-        with:
-          distribution: 'temurin'
-          java-version: '11'
-      - name: Install JMeter
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y jmeter
-      - name: Run JMeter Test
-        run: |
-          jmeter -n -t SampleScript.jmx -l results.jtl -Jxstream.whitelist=org.apache.jmeter.save.ScriptWrapper
+    - name: Checkout repository
+      uses: actions/checkout@v2
+
+    - name: Set up JDK
+      uses: actions/setup-java@v2
+      with:
+        distribution: 'temurin' # Specify the distribution, e.g., 'temurin', 'zulu', etc.
+        java-version: '11'
+
+    - name: Install JMeter
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y jmeter
+
+    - name: Configure JMeter
+      run: |
+        echo 'xstream.whitelist=org.apache.jmeter.save.ScriptWrapper' | sudo tee -a /usr/share/jmeter/bin/jmeter.properties
+
+    - name: Run JMeter Test
+      run: |
+        jmeter -n -t test-plan.jmx -l results.jtl
