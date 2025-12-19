@@ -33,4 +33,4 @@ jobs:
 
     - name: Run JMeter Test
       run: |
-        jmeter -n -t test-plan.jmx -l results.jtl
+        jmeter -n -t SampleScript.jmx -l results.jtl
